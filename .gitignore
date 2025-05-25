@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+# Java
+*.class
+*.jar
+*.war
+*.log
+
+# IntelliJ
+.idea/
+# OS/macOS
+.DS_Store
+
+# Test coverage
+jacoco.exec
