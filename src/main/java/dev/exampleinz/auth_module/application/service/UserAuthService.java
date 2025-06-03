@@ -4,15 +4,14 @@ import dev.exampleinz.auth_module.application.port.input.LoginUserInputPort;
 import dev.exampleinz.auth_module.application.port.input.LogoutUserInputPort;
 import dev.exampleinz.auth_module.application.port.input.RefreshTokenInputPort;
 import dev.exampleinz.auth_module.application.port.input.RegisterUserInputPort;
+import dev.exampleinz.auth_module.application.port.output.RefreshTokenOutputPort;
 import dev.exampleinz.auth_module.application.port.output.UserOutputPort;
+import dev.exampleinz.auth_module.domain.model.RefreshToken;
 import dev.exampleinz.auth_module.domain.model.User;
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.response.AuthenticationResponseDTO;
 import dev.exampleinz.auth_module.infrastructure.adapter.output.persistence.entity.RefreshTokenEntity;
-import dev.exampleinz.auth_module.infrastructure.adapter.output.persistence.entity.UserJpaEntity;
-import dev.exampleinz.auth_module.infrastructure.adapter.output.persistence.repository.RefreshTokenRepository;
 import dev.exampleinz.auth_module.infrastructure.adapter.shared.JwtUtils;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,9 +35,9 @@ public class UserAuthService implements RegisterUserInputPort, LoginUserInputPor
     private JwtUtils jwtUtils;
     private AuthenticationManager authenticationManager;
     private PasswordEncoder passwordEncoder;
-    private RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenOutputPort refreshTokenRepository;
 
-    public UserAuthService(UserOutputPort userOutputPort, JwtUtils jwtUtils, @Lazy AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository) {
+    public UserAuthService(UserOutputPort userOutputPort, JwtUtils jwtUtils, @Lazy AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, RefreshTokenOutputPort refreshTokenRepository) {
         this.userOutputPort = userOutputPort;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
@@ -57,18 +56,37 @@ public class UserAuthService implements RegisterUserInputPort, LoginUserInputPor
         );
         if (authentication.isAuthenticated()) {
             String accessToken = jwtUtils.generateAccessToken(email);
-            UserJpaEntity user = userOutputPort.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+            User user = userOutputPort.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-            RefreshTokenEntity refreshToken = new RefreshTokenEntity();
-            refreshToken.setUser(user);
-            refreshToken.setCreatedAt(Instant.now());
-            refreshToken.setExpiresAt(Instant.now().plusMillis(jwtUtils.getRefreshTokenExpirationMs()));
-            refreshTokenRepository.save(refreshToken);
-
-            return new AuthenticationResponseDTO(accessToken, refreshToken.getId());
+            return getAuthenticationResponseDTO(accessToken, user);
         } else {
             throw new AuthenticationCredentialsNotFoundException("Authentication failed for user: " + email);
         }
+    }
+
+    public AuthenticationResponseDTO handleOAuthLogin(String email) {
+        User user = userOutputPort.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String accessToken = jwtUtils.generateAccessToken(email);
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setCreatedAt(Instant.now());
+        refreshToken.setExpiresAt(Instant.now().plusMillis(jwtUtils.getRefreshTokenExpirationMs()));
+        refreshTokenRepository.save(refreshToken);
+
+        return new AuthenticationResponseDTO(accessToken, refreshToken.getId());
+    }
+
+    private AuthenticationResponseDTO getAuthenticationResponseDTO(String accessToken, User user) {
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setCreatedAt(Instant.now());
+        refreshToken.setExpiresAt(Instant.now().plusMillis(jwtUtils.getRefreshTokenExpirationMs()));
+        refreshTokenRepository.save(refreshToken);
+
+        return new AuthenticationResponseDTO(accessToken, refreshToken.getId());
     }
 
     @Override
@@ -89,12 +107,12 @@ public class UserAuthService implements RegisterUserInputPort, LoginUserInputPor
 
     @Override
     public AuthenticationResponseDTO refreshToken(UUID refreshTokenId) {
-        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository
+        RefreshToken refreshToken = refreshTokenRepository
                 .findByIdAndExpiresAtAfter(refreshTokenId, Instant.now())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid or expired refresh token"));
 
-        String newAccessToken = jwtUtils.generateAccessToken(refreshTokenEntity.getUser().getEmail());
-        return new AuthenticationResponseDTO(newAccessToken, refreshTokenEntity.getId());
+        String newAccessToken = jwtUtils.generateAccessToken(refreshToken.getUser().getEmail());
+        return new AuthenticationResponseDTO(newAccessToken, refreshToken.getId());
     }
 
     @Override
@@ -104,7 +122,7 @@ public class UserAuthService implements RegisterUserInputPort, LoginUserInputPor
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserJpaEntity user = userOutputPort.findByEmail(email)
+        User user = userOutputPort.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
         return new org.springframework.security.core.userdetails.User(

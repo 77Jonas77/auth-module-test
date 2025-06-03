@@ -10,9 +10,9 @@ import java.util.UUID;
 public interface UserOutputPort {
     User save(User user);
 
-    Optional<UserJpaEntity> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    Optional<UserJpaEntity> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
     boolean existsByEmail(String email);
 

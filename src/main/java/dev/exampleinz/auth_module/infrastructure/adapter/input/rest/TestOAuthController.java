@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/test/jwt")
-public class TestController {
+@RequestMapping("/api/test/oauth")
+public class TestOAuthController {
 
     @GetMapping("/all")
     public String allAccess() {
-        return "Nice.";
+        return "hello there!.";
     }
 
 }

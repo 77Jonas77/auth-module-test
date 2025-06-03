@@ -28,15 +28,15 @@ public class UserPersistenceAdapter implements UserOutputPort {
     }
 
     @Override
-    public Optional<UserJpaEntity> findByEmail(String email) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findFirstByEmail(email);
-        return Optional.ofNullable(userJpaEntity);
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userJpaRepository.findFirstByEmail(email))
+                .map(userPersistenceMapper::toDomain);
     }
 
     @Override
-    public Optional<UserJpaEntity> findByUsername(String username) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findFirstByUsername(username);
-        return Optional.ofNullable(userJpaEntity);
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(userJpaRepository.findFirstByUsername(username))
+                .map(userPersistenceMapper::toDomain);
     }
 
     @Override

@@ -17,6 +17,9 @@ public class User {
     private boolean isProfilePublic;
     private boolean isEmailVerified;
 
+    public User() {
+    }
+
     public User(String name, String lastName, String email, String password, String username,
                 LocalDate dateOfBirth, boolean sendBudgetReport, boolean isProfilePublic) {
         this.name = name;
