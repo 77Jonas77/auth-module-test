@@ -44,3 +44,6 @@ build/
 
 # Test coverage
 jacoco.exec
+
+# Config files
+!/src/main/resources/application.yml
