@@ -10,6 +10,7 @@ import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.respons
 import dev.exampleinz.auth_module.infrastructure.adapter.output.persistence.entity.RefreshTokenEntity;
 import dev.exampleinz.auth_module.infrastructure.adapter.output.persistence.repository.RefreshTokenRepository;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
@@ -41,13 +42,22 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         AuthenticationResponseDTO authResponse = authService.handleOAuthLogin(email);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-        System.out.println("\n" + response + "\n");
-        objectMapper.writeValue(response.getWriter(), authResponse);
+        Cookie accessTokenCookie = new Cookie("accessToken", authResponse.getAccessToken());
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(3600);
+//        accessTokenCookie.setSecure(true);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", authResponse.getRefreshToken().toString());
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(604800);
+//        refreshTokenCookie.setSecure(true);
+
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
+
+        response.sendRedirect("http://localhost:3000/home" + authResponse);
 
     }
-
-
 }

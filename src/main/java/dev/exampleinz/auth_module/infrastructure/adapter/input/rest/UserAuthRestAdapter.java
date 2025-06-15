@@ -9,16 +9,12 @@ import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.request
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.response.AuthenticationResponseDTO;
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.response.RegisterUserResponseDTO;
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.mapper.UserRestMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")

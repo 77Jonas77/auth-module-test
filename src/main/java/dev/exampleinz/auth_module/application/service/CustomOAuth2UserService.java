@@ -29,7 +29,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-//        System.out.println("XDDDDD1");
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String,Object> attributes = oAuth2User.getAttributes();
         //mozna dodac metode od sprawdzania poprawnosci danych usera

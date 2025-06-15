@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  spring-app:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      H2_PASSWORD: ${H2_PASSWORD}
+      H2_USERNAME: ${H2_USERNAME}
+      SPRING_PROFILES_ACTIVE: prod

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/test/jwt")
+@RequestMapping("/api/test/public")
 public class TestController {
 
     @GetMapping("/all")

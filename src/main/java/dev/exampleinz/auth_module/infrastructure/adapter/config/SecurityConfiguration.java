@@ -3,19 +3,15 @@ package dev.exampleinz.auth_module.infrastructure.adapter.config;
 import dev.exampleinz.auth_module.application.service.CustomOAuth2UserService;
 import dev.exampleinz.auth_module.infrastructure.adapter.config.filter.AuthEntryPointJwt;
 import dev.exampleinz.auth_module.infrastructure.adapter.config.filter.AuthJwtTokenFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -40,42 +36,24 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .securityMatcher("/api/test/jwt/**")
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/test/jwt/all").authenticated()
+                        .requestMatchers("/auth/*", "/auth/**", "/oauth2/**", "/h2-console/**", "/v3/api-docs/**",
+                                "/swagger-ui/**", "/swagger-ui.html", "/api/test/public/*").permitAll()
                         .anyRequest().authenticated()
-                )
-                .exceptionHandling(e -> e.authenticationEntryPoint(authEntryPointJwt))
-                .addFilterBefore(authJwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain formSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/auth/**", "/oauth2/**", "/h2-console/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
                 )
                 .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(userInfo ->
-                                userInfo.userService(oauth2UserService())
-                        )
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())) // dla H2 konsoli
-                .build();
+                .addFilterBefore(authJwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(e -> e.authenticationEntryPoint(authEntryPointJwt))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+
+        return http.build();
     }
 
     @Bean
