@@ -17,4 +17,6 @@ public interface UserOutputPort {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    Optional<UserJpaEntity> findById(UUID id);
 }

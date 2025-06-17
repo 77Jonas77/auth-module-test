@@ -8,6 +8,7 @@ import dev.exampleinz.auth_module.infrastructure.adapter.output.persistence.repo
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class UserPersistenceAdapter implements UserOutputPort {
@@ -47,6 +48,11 @@ public class UserPersistenceAdapter implements UserOutputPort {
     @Override
     public boolean existsByUsername(String username) {
         return userJpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Optional<UserJpaEntity> findById(UUID id) {
+        return userJpaRepository.findById(id);
     }
 
 }

@@ -2,13 +2,11 @@ package dev.exampleinz.auth_module.infrastructure.adapter.input.rest;
 
 import dev.exampleinz.auth_module.application.service.UserAuthService;
 import dev.exampleinz.auth_module.domain.model.User;
-import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.request.AuthenticationRequestDTO;
-import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.request.LogutRequestDTO;
-import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.request.RefreshTokenDTO;
-import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.request.RegisterUserRequestDTO;
+import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.request.*;
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.response.AuthenticationResponseDTO;
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.data.response.RegisterUserResponseDTO;
 import dev.exampleinz.auth_module.infrastructure.adapter.input.rest.mapper.UserRestMapper;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,4 +65,13 @@ public class UserAuthRestAdapter {
         }
     }
 
+    @PostMapping("/exchange-google-code")
+    public ResponseEntity<AuthenticationResponseDTO> exchangeGoogleCode(@RequestBody CodeExchangeRequestDTO request){
+        try {
+            AuthenticationResponseDTO responseDTO = userAuthService.handleOAuthCodeExchange(request.code(), request.codeVerifier());
+            return ResponseEntity.ok(responseDTO);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 }

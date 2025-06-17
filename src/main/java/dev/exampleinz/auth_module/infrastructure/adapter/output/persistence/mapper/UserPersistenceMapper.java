@@ -20,7 +20,8 @@ public class UserPersistenceMapper {
                 userJpaEntity.getMoney(),
                 userJpaEntity.isSendBudgetReport(),
                 userJpaEntity.isProfilePublic(),
-                userJpaEntity.isEmailVerified()
+                userJpaEntity.isEmailVerified(),
+                userJpaEntity.isFullDataProvided()
         );
     }
 
@@ -38,6 +39,7 @@ public class UserPersistenceMapper {
         entity.setSendBudgetReport(user.isSendBudgetReport());
         entity.setProfilePublic(user.isProfilePublic());
         entity.setEmailVerified(user.isEmailVerified());
+        entity.setFullDataProvided(user.isFullDataProvided());
         return entity;
     }
 

@@ -48,6 +48,9 @@ public class UserJpaEntity {
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified;
 
+    @Column(name = "is_full_data_provided", nullable = false)
+    private boolean isFullDataProvided;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshTokenEntity> refreshTokens = new ArrayList<>();
 
@@ -156,5 +159,13 @@ public class UserJpaEntity {
 
     public void setRefreshTokens(List<RefreshTokenEntity> refreshTokens) {
         this.refreshTokens = refreshTokens;
+    }
+
+    public boolean isFullDataProvided() {
+        return isFullDataProvided;
+    }
+
+    public void setFullDataProvided(boolean fullDataProvided) {
+        isFullDataProvided = fullDataProvided;
     }
 }

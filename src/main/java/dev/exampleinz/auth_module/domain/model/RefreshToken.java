@@ -3,7 +3,6 @@ package dev.exampleinz.auth_module.domain.model;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
-
 public class RefreshToken {
 
     private UUID id;
@@ -21,14 +20,9 @@ public class RefreshToken {
     public RefreshToken() {
     }
 
-    public static RefreshToken createNew(User user, Instant createdAt, Instant expiresAt) {
-        return new RefreshToken(UUID.randomUUID(), user, createdAt, expiresAt);
-    }
-
     public UUID getId() {
         return id;
     }
-
     public User getUser() {
         return user;
     }

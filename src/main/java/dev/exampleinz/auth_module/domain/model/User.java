@@ -16,6 +16,7 @@ public class User {
     private boolean sendBudgetReport;
     private boolean isProfilePublic;
     private boolean isEmailVerified;
+    private boolean isFullDataProvided;
 
     public User() {
     }
@@ -35,7 +36,7 @@ public class User {
         this.isEmailVerified = false;
     }
 
-    public User(UUID id, String name, String lastName, String email, String password, String username, LocalDate dateOfBirth, int experience, int money, boolean sendBudgetReport, boolean isProfilePublic, boolean isEmailVerified) {
+    public User(UUID id, String name, String lastName, String email, String password, String username, LocalDate dateOfBirth, int experience, int money, boolean sendBudgetReport, boolean isProfilePublic, boolean isEmailVerified, boolean isFullDataProvided) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -48,6 +49,7 @@ public class User {
         this.sendBudgetReport = sendBudgetReport;
         this.isProfilePublic = isProfilePublic;
         this.isEmailVerified = isEmailVerified;
+        this.isFullDataProvided = isFullDataProvided;
     }
 
     public UUID getId() {
@@ -140,5 +142,13 @@ public class User {
 
     public void setEmailVerified(boolean emailVerified) {
         isEmailVerified = emailVerified;
+    }
+
+    public boolean isFullDataProvided() {
+        return isFullDataProvided;
+    }
+
+    public void setFullDataProvided(boolean fullDataProvided) {
+        isFullDataProvided = fullDataProvided;
     }
 }
